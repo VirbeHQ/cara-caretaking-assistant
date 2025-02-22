@@ -7,6 +7,8 @@ export const env = createEnv({
    * isn't built with invalid env vars.
    */
   server: {
+    ELEVENLABS_AGENT_ID: z.string(),
+    ELEVENLABS_XI_API_KEY: z.string(),
     AUTH_SECRET:
       process.env.NODE_ENV === "production"
         ? z.string()
@@ -33,6 +35,8 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
+    ELEVENLABS_AGENT_ID: process.env.ELEVENLABS_AGENT_ID,
+    ELEVENLABS_XI_API_KEY: process.env.ELEVENLABS_XI_API_KEY,
     AUTH_SECRET: process.env.AUTH_SECRET,
     AUTH_DISCORD_ID: process.env.AUTH_DISCORD_ID,
     AUTH_DISCORD_SECRET: process.env.AUTH_DISCORD_SECRET,

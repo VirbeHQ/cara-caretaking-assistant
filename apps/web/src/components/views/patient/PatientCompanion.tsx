@@ -1,8 +1,9 @@
 import {useState} from 'react';
-import { useRouter } from 'next/navigation'
+import {useRouter} from 'next/navigation'
 
 import {Button} from '~/components/ui/button';
 import {CheckCircle2, LayoutDashboard, MessageSquare, Mic, MicOff, Phone} from 'lucide-react';
+import {ConvAI} from "~/components/elements/ConvAI";
 
 interface ChecklistItem {
   id: string;
@@ -73,6 +74,8 @@ export function PatientCompanion() {
             <p className="text-lg text-center">{currentMessage}</p>
           </div>
         </div>
+
+        <ConvAI/>
 
         {/* Voice Control */}
         <div className="flex justify-center mb-8">

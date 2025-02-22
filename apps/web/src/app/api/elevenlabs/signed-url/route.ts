@@ -1,8 +1,9 @@
 import {NextResponse} from "next/server";
+import {env} from "~/env";
 
 export async function GET() {
-  const agentId = process.env.AGENT_ID
-  const apiKey = process.env.XI_API_KEY
+  const agentId = env.ELEVENLABS_AGENT_ID
+  const apiKey = env.ELEVENLABS_XI_API_KEY
   if (!agentId) {
     throw Error('AGENT_ID is not set')
   }
@@ -28,6 +29,6 @@ export async function GET() {
     return NextResponse.json({signedUrl: data.signed_url})
   } catch (error) {
     console.error('Error:', error);
-    return NextResponse.json({ error: 'Failed to get signed URL' }, { status: 500 });
+    return NextResponse.json({error: 'Failed to get signed URL'}, {status: 500});
   }
 }
