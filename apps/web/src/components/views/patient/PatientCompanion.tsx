@@ -4,6 +4,7 @@ import {useRouter} from 'next/navigation'
 import {Button} from '~/components/ui/button';
 import {CheckCircle2, LayoutDashboard, MessageSquare, Mic, MicOff, Phone} from 'lucide-react';
 import {ConvAI} from "~/components/elements/ConvAI";
+import {AGENT_OVERRIDES} from "~/common/prompt";
 
 interface ChecklistItem {
   id: string;
@@ -75,7 +76,11 @@ export function PatientCompanion() {
           </div>
         </div>
 
-        <ConvAI/>
+        <ConvAI
+          prompt={AGENT_OVERRIDES.PATIENT.prompt}
+          firstMessage={AGENT_OVERRIDES.PATIENT.firstMessage}
+          dynamicVariables={AGENT_OVERRIDES.PATIENT.defaultVariables}
+        />
 
         {/* Voice Control */}
         <div className="flex justify-center mb-8">

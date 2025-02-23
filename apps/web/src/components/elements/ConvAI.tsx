@@ -6,6 +6,7 @@ import {useState} from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "~/components/ui/card";
 import {Conversation} from "@11labs/client";
 import {cn} from "~/lib/utils";
+import {AGENT_OVERRIDES} from "~/common/prompt";
 
 async function requestMicrophonePermission() {
   try {
@@ -26,7 +27,20 @@ async function getSignedUrl(): Promise<string> {
   return data.signedUrl
 }
 
-export function ConvAI() {
+interface Props {
+  prompt?: string;
+  firstMessage?: string;
+  dynamicVariables?: Record<string, string | number | boolean>;
+  tools?: Record<string, (parameters: any) => Promise<string | number | void> | string | number | void>;
+}
+
+export function ConvAI(
+  {
+    prompt = AGENT_OVERRIDES.PATIENT.prompt,
+    firstMessage = AGENT_OVERRIDES.DEFAULT.firstMessage,
+    dynamicVariables = {},
+    tools = {}
+  }: Props) {
   const [conversation, setConversation] = useState<Conversation | null>(null)
   const [isConnected, setIsConnected] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
@@ -40,6 +54,16 @@ export function ConvAI() {
     const signedUrl = await getSignedUrl()
     const conversation = await Conversation.startSession({
       signedUrl: signedUrl,
+      overrides: {
+        agent: {
+          prompt: {
+            prompt: prompt
+          },
+          firstMessage
+        },
+      },
+      dynamicVariables,
+      clientTools: tools,
       onConnect: () => {
         setIsConnected(true)
         setIsSpeaking(true)
