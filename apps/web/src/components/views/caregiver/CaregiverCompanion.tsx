@@ -1,11 +1,12 @@
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useRouter} from 'next/navigation'
 
 import {Button} from '~/components/ui/button';
+import {ConvAI} from "~/components/elements/ConvAI";
+
 import {
   AlertCircle,
   Bell,
-  Calendar,
   CheckCircle2,
   Heart,
   LayoutDashboard,
@@ -13,12 +14,14 @@ import {
   Phone,
   ShoppingBag
 } from 'lucide-react';
+
 import {useLocalStorage} from "@uidotdev/usehooks";
-import {ConvAI} from "~/components/elements/ConvAI";
 import {AGENT_OVERRIDES} from "~/common/prompt";
+import { CompanionBlob } from '~/components/elements/CompanionBlob';
+import {Role} from "@11labs/client";
 
 interface Alert {
-  type: 'wellbeing' | 'medication' | 'activity' | 'emergency';
+  type: 'wellbeing' | 'medication' | 'activity' | 'emergency' | 'symptom';
   message: string;
   time: string;
   priority: 'high' | 'medium' | 'low';
@@ -26,15 +29,15 @@ interface Alert {
 }
 
 export function CaregiverCompanion() {
-  const [healthSymptoms, setHealthSymptoms] = useLocalStorage<string[]>('healthSymptoms', []);
-  const [shoppingNeeds, setShoppingNeeds] = useLocalStorage<string[]>('shoppingNeeds', []);
+  const [healthSymptoms, setHealthSymptoms] = useLocalStorage<string[]>('healthSymptoms');
+  const [shoppingNeeds, setShoppingNeeds] = useLocalStorage<string[]>('shoppingNeeds');
+
+  const [currentMessage, setCurrentMessage] = useState("Hello! How can I help you today?");
 
   const healthSymptomsString = useMemo(() => {
-    console.log(healthSymptoms);
     return healthSymptoms.map((symptom, index) => `${index + 1}. ${symptom}`).join('\n');
   }, [healthSymptoms]);
   const shoppingNeedsString = useMemo(() => {
-    console.log(shoppingNeeds);
     return shoppingNeeds.map((need, index) => `${index + 1}. ${need}`).join('\n');
   }, [shoppingNeeds]);
 
@@ -44,24 +47,31 @@ export function CaregiverCompanion() {
   }, [setHealthSymptoms, setShoppingNeeds]);
 
   const router = useRouter();
-  const [alerts, setAlerts] = useState<Alert[]>([
-    {
-      type: 'wellbeing',
-      message: 'Mom reported feeling tired during afternoon check',
-      time: '2:30 PM',
-      priority: 'medium',
-      read: false
-    },
-    {
-      type: 'medication',
-      message: 'Blood pressure medication reminder missed',
-      time: '11:00 AM',
-      priority: 'high',
-      read: false
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+
+  const now = useMemo(() => new Date().toLocaleTimeString(), []);
+
+  useEffect(() => {
+    if (healthSymptoms.length > 0) {
+      setAlerts(healthSymptoms.map(symptom => ({
+        type: 'symptom',
+        message: `Mom reported ${symptom}`,
+        time: now,
+        priority: 'medium',
+        read: false
+      })));
     }
-  ]);
+
+  }, [now]);
+
+  const onConvAIMessage = useCallback((message, source: Role) => {
+    if (source === 'ai'){
+      setCurrentMessage(message);
+    }
+  }, []);
 
   const markAlertRead = (index: number) => {
+    console.log('Marking alert as read:', alerts[index]);
     setAlerts(alerts.map((alert, i) =>
       i === index ? {...alert, read: true} : alert
     ));
@@ -105,6 +115,9 @@ export function CaregiverCompanion() {
             </Button>
           </div>
         </div>
+
+        <CompanionBlob currentMessage={currentMessage}/>
+
         <div className="mb-8">
           <ConvAI
             prompt={AGENT_OVERRIDES.CAREGIVER.prompt}
@@ -114,6 +127,7 @@ export function CaregiverCompanion() {
               healthSymptoms: healthSymptomsString,
               shoppingNeeds: shoppingNeedsString
             }}
+            onMessage={onConvAIMessage}
           />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -159,6 +173,27 @@ export function CaregiverCompanion() {
             </div>
           </section>
 
+          {/* Shopping & Tasks */}
+          <section className="bg-white rounded-xl p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-lg">Shopping & Tasks</h3>
+              <ShoppingBag className="w-6 h-6 text-green-500"/>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-medium mb-2">Groceries Needed</h4>
+                <ul className="space-y-2">
+                  {shoppingNeeds.map((item, index) => (
+                    <li key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded text-sm">
+                      <CheckCircle2 className="w-4 h-4 text-gray-400"/>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </section>
+
           {/* Quick Status */}
           <section className="bg-white rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
@@ -190,73 +225,8 @@ export function CaregiverCompanion() {
             </div>
           </section>
 
-          {/* Shopping & Tasks */}
-          <section className="bg-white rounded-xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-lg">Shopping & Tasks</h3>
-              <ShoppingBag className="w-6 h-6 text-green-500"/>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-medium mb-2">Medications Needed</h4>
-                <ul className="space-y-2">
-                  <li className="flex items-center gap-2 p-2 bg-red-50 rounded text-sm">
-                    <AlertCircle className="w-4 h-4 text-red-500"/>
-                    Blood pressure medication (3 days left)
-                  </li>
-                  <li className="flex items-center gap-2 p-2 bg-yellow-50 rounded text-sm">
-                    <AlertCircle className="w-4 h-4 text-yellow-500"/>
-                    Vitamin D supplements (1 week left)
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-medium mb-2">Groceries Needed</h4>
-                <ul className="space-y-2">
-                  {['Fruits', 'Vegetables', 'Milk', 'Bread'].map((item, index) => (
-                    <li key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded text-sm">
-                      <CheckCircle2 className="w-4 h-4 text-gray-400"/>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </section>
-
           {/* Upcoming Schedule */}
-          <section className="bg-white rounded-xl p-6 shadow-sm md:col-span-2">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-lg">Upcoming Schedule</h3>
-              <Calendar className="w-6 h-6 text-blue-500"/>
-            </div>
-            <div className="space-y-3">
-              <div className="p-4 bg-purple-50 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Doctor's Appointment</p>
-                    <p className="text-sm text-gray-600">Annual checkup with Dr. Smith</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium">Today</p>
-                    <p className="text-sm text-gray-500">10:15 AM</p>
-                  </div>
-                </div>
-              </div>
-              <div className="p-4 bg-blue-50 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Visit with Mom</p>
-                    <p className="text-sm text-gray-600">Weekly family visit</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium">Sunday</p>
-                    <p className="text-sm text-gray-500">2:00 PM</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
+
         </div>
       </div>
     </div>

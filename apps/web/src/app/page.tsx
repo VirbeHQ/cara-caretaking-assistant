@@ -19,26 +19,26 @@ export default async function Home() {
           <h1 className="text-5xl text-center font-extrabold tracking-tight sm:text-[5rem]">
             Kara - keeping minds healthy and connecting people
           </h1>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
+          {session && <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
             <Link
               className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
               href="/patient/companion"
               target="_blank"
             >
-              <h3 className="text-2xl font-bold">Patient →</h3>
+              <h3 className="text-2xl font-bold">I am a patient</h3>
             </Link>
             <Link
               className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
               href="/caregiver/companion"
               target="_blank"
             >
-              <h3 className="text-2xl font-bold">Caregiver →</h3>
+              <h3 className="text-2xl font-bold">I am a caregiver</h3>
             </Link>
-          </div>
+          </div>}
           <div className="flex flex-col items-center gap-2">
-            <p className="text-2xl text-white">
-              {hello ? hello.greeting : "Loading tRPC query..."}
-            </p>
+            {/*<p className="text-2xl text-white">*/}
+            {/*  {hello ? hello.greeting : "Loading tRPC query..."}*/}
+            {/*</p>*/}
 
             <div className="flex flex-col items-center justify-center gap-4">
               <p className="text-center text-2xl text-white">
@@ -53,7 +53,7 @@ export default async function Home() {
             </div>
           </div>
 
-          {session?.user && <LatestPost />}
+          {/*{session?.user && <LatestPost />}*/}
         </div>
       </main>
     </HydrateClient>

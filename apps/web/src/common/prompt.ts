@@ -35,7 +35,7 @@ export const AGENT_OVERRIDES = {
     prompt: PATIENT_AGENT_PROMPT,
     firstMessage: "Hey! How are you today?",
     defaultVariables: {
-      agentName: "Eric"
+      agentName: "Cara"
     }
   },
   PATIENT: {
@@ -43,7 +43,7 @@ export const AGENT_OVERRIDES = {
     firstMessage: "Hey! How are you today?",
     tools: [PATIENT_AGENT_TOOLS.HealthSymptomDetected, PATIENT_AGENT_TOOLS.ShoppingNeed, PATIENT_AGENT_TOOLS.EndCall],
     defaultVariables: {
-      agentName: "Eric",
+      agentName: "Cara",
       tasks: "1. Ask the patient how they are feeling today. 2. Ask the patient if they have any health symptoms. 3. Ask the patient if they have any shopping needs."
     }
   },
@@ -51,7 +51,7 @@ export const AGENT_OVERRIDES = {
     prompt: CAREGIVER_AGENT_PROMPT,
     firstMessage: "Hey! How are you today?",
     defaultVariables: {
-      agentName: "Eric",
+      agentName: "Cara",
       healthSymptoms: "1. Mom reported feeling tired during afternoon check",
       shoppingNeeds: "1. Blood pressure medication reminder missed"
     }

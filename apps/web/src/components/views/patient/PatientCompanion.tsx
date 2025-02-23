@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useCallback, useState} from 'react';
 import {useRouter} from 'next/navigation'
 
 import {Button} from '~/components/ui/button';
@@ -7,6 +7,8 @@ import {ConvAI} from "~/components/elements/ConvAI";
 import {AGENT_OVERRIDES, PATIENT_AGENT_TOOLS} from "~/common/prompt";
 
 import {useLocalStorage} from "@uidotdev/usehooks";
+import {CompanionBlob} from "~/components/elements/CompanionBlob";
+import {Role} from "@11labs/client";
 
 interface ChecklistItem {
   id: string;
@@ -30,6 +32,12 @@ export function PatientCompanion() {
   ]);
 
   const [dailyChecklist, setDailyChecklist] = useState(checklist);
+
+  const onConvAIMessage = useCallback((message, source: Role) => {
+    if (source === "ai") {
+      setCurrentMessage(message);
+    }
+  }, []);
 
   const toggleChecklistItem = (id: string) => {
     setDailyChecklist(items =>
@@ -63,38 +71,23 @@ export function PatientCompanion() {
         </div>
 
         {/* Companion Blob */}
-        {/*<div className="relative h-96 flex items-center justify-center mb-8">*/}
-        {/*  <div className="absolute">*/}
-        {/*    <div className="relative">*/}
-        {/*      <div*/}
-        {/*        className="animate-blob w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>*/}
-        {/*      <div*/}
-        {/*        className="animate-blob animation-delay-2000 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 absolute -top-4 -left-4"></div>*/}
-        {/*      <div*/}
-        {/*        className="animate-blob animation-delay-4000 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 absolute -bottom-8 -right-4"></div>*/}
-        {/*    </div>*/}
-        {/*  </div>*/}
-
-        {/*  /!* Message Display *!/*/}
-        {/*  <div className="relative z-10 bg-white bg-opacity-90 p-6 rounded-2xl shadow-lg max-w-lg mx-auto">*/}
-        {/*    <p className="text-lg text-center">{currentMessage}</p>*/}
-        {/*  </div>*/}
-        {/*</div>*/}
+        <CompanionBlob currentMessage={currentMessage}/>
 
         <div className="flex justify-center mb-8">
           <ConvAI
             prompt={AGENT_OVERRIDES.PATIENT.prompt}
             firstMessage={AGENT_OVERRIDES.PATIENT.firstMessage}
             dynamicVariables={AGENT_OVERRIDES.PATIENT.defaultVariables}
+            onMessage={onConvAIMessage}
             tools={
               {
                 [PATIENT_AGENT_TOOLS.HealthSymptomDetected]: (params: { symptom: string }) => {
-                  console.log('HealthSymptomDetected: ' + params.symptom)
+                  // console.log('HealthSymptomDetected: ' + params.symptom)
                   healthSymptoms.push(params.symptom);
                   setHealthSymptoms(healthSymptoms);
                 },
                 [PATIENT_AGENT_TOOLS.ShoppingNeed]: (params: { item: string }) => {
-                  console.log('ShoppingNeed: ' + params.item)
+                  // console.log('ShoppingNeed: ' + params.item)
                   shoppingNeeds.push(params.item);
                   setShoppingNeeds(shoppingNeeds);
                 },
@@ -118,6 +111,7 @@ export function PatientCompanion() {
         {/*    )}*/}
         {/*  </Button>*/}
         {/*</div>*/}
+
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Quick Prompts */}

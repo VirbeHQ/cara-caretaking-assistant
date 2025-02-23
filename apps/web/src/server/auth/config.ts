@@ -1,6 +1,7 @@
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
+import GoogleProvider from "next-auth/providers/google";
 
 import { db } from "~/server/db";
 import {
@@ -38,7 +39,11 @@ declare module "next-auth" {
  */
 export const authConfig = {
   providers: [
-    DiscordProvider,
+    // DiscordProvider,
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET
+    })
     /**
      * ...add more providers here.
      *
@@ -55,6 +60,15 @@ export const authConfig = {
     sessionsTable: sessions,
     verificationTokensTable: verificationTokens,
   }),
+  // session: {
+  //   strategy: 'jwt'
+  // },
+  logger: {
+    error: (error) => console.error(JSON.stringify(error, null, 2)),
+    warn: console.warn,
+    info: console.log,
+    debug: console.log,
+  },
   callbacks: {
     session: ({ session, user }) => ({
       ...session,

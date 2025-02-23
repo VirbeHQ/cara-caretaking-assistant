@@ -4,7 +4,7 @@ import {Button} from "~/components/ui/button";
 import * as React from "react";
 import {useState} from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "~/components/ui/card";
-import {Conversation} from "@11labs/client";
+import {Conversation, Role} from "@11labs/client";
 import {cn} from "~/lib/utils";
 import {AGENT_OVERRIDES} from "~/common/prompt";
 
@@ -28,18 +28,22 @@ async function getSignedUrl(): Promise<string> {
 }
 
 interface Props {
+  showBlob?: boolean;
   prompt?: string;
   firstMessage?: string;
   dynamicVariables?: Record<string, string | number | boolean>;
   tools?: Record<string, (parameters: any) => Promise<string | number | void> | string | number | void>;
+  onMessage?: (message: string, source: Role) => void;
 }
 
 export function ConvAI(
   {
+    showBlob = false,
     prompt = AGENT_OVERRIDES.PATIENT.prompt,
     firstMessage = AGENT_OVERRIDES.DEFAULT.firstMessage,
     dynamicVariables = {},
-    tools = {}
+    tools = {},
+    onMessage
   }: Props) {
   const [conversation, setConversation] = useState<Conversation | null>(null)
   const [isConnected, setIsConnected] = useState(false)
@@ -79,6 +83,12 @@ export function ConvAI(
       onModeChange: ({mode}) => {
         setIsSpeaking(mode === 'speaking')
       },
+      onMessage: ({message, source}) => {
+        console.log(message, source)
+        if (onMessage) {
+          onMessage(message, source)
+        }
+      }
     })
     setConversation(conversation)
   }
@@ -105,13 +115,12 @@ export function ConvAI(
             </CardTitle>
           </CardHeader>
           <div className={'flex flex-col gap-y-4 text-center'}>
-            <div className={cn('orb my-16 mx-12',
+            {showBlob && <div className={cn('orb my-16 mx-12',
               isSpeaking ? 'animate-orb' : (conversation && 'animate-orb-slow'),
               isConnected ? 'orb-active' : 'orb-inactive')}
-            ></div>
+            ></div>}
 
-
-            <Button
+            {!isConnected && <Button
               variant={'outline'}
               className={'rounded-full'}
               size={"lg"}
@@ -119,8 +128,8 @@ export function ConvAI(
               onClick={startConversation}
             >
               Start conversation
-            </Button>
-            <Button
+            </Button>}
+            {isConnected && <Button
               variant={'outline'}
               className={'rounded-full'}
               size={"lg"}
@@ -128,7 +137,7 @@ export function ConvAI(
               onClick={endConversation}
             >
               End conversation
-            </Button>
+            </Button>}
           </div>
         </CardContent>
       </Card>
