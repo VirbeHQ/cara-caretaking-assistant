@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 import {useRouter} from 'next/navigation'
 
 import {Button} from '~/components/ui/button';
@@ -13,6 +13,9 @@ import {
   Phone,
   ShoppingBag
 } from 'lucide-react';
+import {useLocalStorage} from "@uidotdev/usehooks";
+import {ConvAI} from "~/components/elements/ConvAI";
+import {AGENT_OVERRIDES} from "~/common/prompt";
 
 interface Alert {
   type: 'wellbeing' | 'medication' | 'activity' | 'emergency';
@@ -23,6 +26,23 @@ interface Alert {
 }
 
 export function CaregiverCompanion() {
+  const [healthSymptoms, setHealthSymptoms] = useLocalStorage<string[]>('healthSymptoms', []);
+  const [shoppingNeeds, setShoppingNeeds] = useLocalStorage<string[]>('shoppingNeeds', []);
+
+  const healthSymptomsString = useMemo(() => {
+    console.log(healthSymptoms);
+    return healthSymptoms.map((symptom, index) => `${index + 1}. ${symptom}`).join('\n');
+  }, [healthSymptoms]);
+  const shoppingNeedsString = useMemo(() => {
+    console.log(shoppingNeeds);
+    return shoppingNeeds.map((need, index) => `${index + 1}. ${need}`).join('\n');
+  }, [shoppingNeeds]);
+
+  const resetCallback = useCallback(() => {
+    setHealthSymptoms([]);
+    setShoppingNeeds([]);
+  }, [setHealthSymptoms, setShoppingNeeds]);
+
   const router = useRouter();
   const [alerts, setAlerts] = useState<Alert[]>([
     {
@@ -64,6 +84,12 @@ export function CaregiverCompanion() {
             <Button
               variant="outline"
               className="flex items-center gap-2"
+              onClick={resetCallback}>
+              Reset
+            </Button>
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
               onClick={() => window.alert('Opening chat...')}
             >
               <MessageSquare className="w-4 h-4"/>
@@ -79,7 +105,17 @@ export function CaregiverCompanion() {
             </Button>
           </div>
         </div>
-
+        <div className="mb-8">
+          <ConvAI
+            prompt={AGENT_OVERRIDES.CAREGIVER.prompt}
+            firstMessage={AGENT_OVERRIDES.CAREGIVER.firstMessage}
+            dynamicVariables={{
+              ...AGENT_OVERRIDES.CAREGIVER.defaultVariables,
+              healthSymptoms: healthSymptomsString,
+              shoppingNeeds: shoppingNeedsString
+            }}
+          />
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Alerts & Notifications */}
           <section className="bg-white rounded-xl p-6 shadow-sm md:col-span-2">
