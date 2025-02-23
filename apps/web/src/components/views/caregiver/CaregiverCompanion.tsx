@@ -120,6 +120,7 @@ export function CaregiverCompanion() {
 
         <div className="mb-8">
           <ConvAI
+            ctaButton={"Get briefing"}
             prompt={AGENT_OVERRIDES.CAREGIVER.prompt}
             firstMessage={AGENT_OVERRIDES.CAREGIVER.firstMessage}
             dynamicVariables={{

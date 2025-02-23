@@ -28,16 +28,19 @@ async function getSignedUrl(): Promise<string> {
 }
 
 interface Props {
+  ctaButton?: string;
   showBlob?: boolean;
   prompt?: string;
   firstMessage?: string;
   dynamicVariables?: Record<string, string | number | boolean>;
   tools?: Record<string, (parameters: any) => Promise<string | number | void> | string | number | void>;
   onMessage?: (message: string, source: Role) => void;
+
 }
 
 export function ConvAI(
   {
+    ctaButton = 'Start conversation',
     showBlob = false,
     prompt = AGENT_OVERRIDES.PATIENT.prompt,
     firstMessage = AGENT_OVERRIDES.DEFAULT.firstMessage,
@@ -127,7 +130,7 @@ export function ConvAI(
               disabled={conversation !== null && isConnected}
               onClick={startConversation}
             >
-              Start conversation
+              {ctaButton}
             </Button>}
             {isConnected && <Button
               variant={'outline'}

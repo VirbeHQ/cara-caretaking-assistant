@@ -75,6 +75,7 @@ export function PatientCompanion() {
 
         <div className="flex justify-center mb-8">
           <ConvAI
+            ctaButton={"Start morning check-in"}
             prompt={AGENT_OVERRIDES.PATIENT.prompt}
             firstMessage={AGENT_OVERRIDES.PATIENT.firstMessage}
             dynamicVariables={AGENT_OVERRIDES.PATIENT.defaultVariables}
