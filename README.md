@@ -1,14 +1,54 @@
-# Turborepo starter
+# Turborepo with main app made with T3 App Stack
 
-This Turborepo starter is maintained by the Turborepo core team.
+This project was kickstarted with [T3 App Stack](https://create.t3.gg/) and created during [ElevenLabs Worldwide Hackathon](http://hackathon.elevenlabs.io/).
 
-## Using this example
+## About authors
+- [Krzysztof (Chris) Wrobel](https://www.linkedin.com/in/chris-wrobel/) - Founder and CEO @[Virbe.ai](https://virbe.ai/)
+- [Olga Jakubowska](https://www.linkedin.com/in/olga-jakubowska/) - Head of Product @[Virbe.ai](https://virbe.ai/)
 
-Run the following command:
+## Setup
 
-```sh
-npx create-turbo@latest
+To get started and install all dependencies, run the following commands:
+```bash
+pnpm install
 ```
+
+Head out to `apps/web` and create `.env` file using the `.env.example` as a template:
+```bash
+cp .env.example .env
+
+# Fill out the .env file with your configuration, but most importantly ElevenLabs Agent credentials
+vim .env
+```
+
+Make sure to fill out the `.env` file with your ElevenLabs Agent credentials:
+```
+...
+
+# ElevenLabs Agent ID
+ELEVENLABS_AGENT_ID=<your-agent-id>
+# ElevenLabs API Key
+ELEVENLABS_XI_API_KEY=<your-api-key>
+
+...
+```
+
+To launch the development server, run the following command:
+```bash
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Learn More
+
+To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+
+- [Documentation](https://create.t3.gg/)
+- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+
+You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+
 
 ## What's inside?
 
@@ -23,14 +63,6 @@ This Turborepo includes the following packages/apps:
 - `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
 
 Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
 
 ### Build
 
